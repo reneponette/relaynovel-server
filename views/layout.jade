@@ -1,0 +1,27 @@
+doctype html
+html
+	head
+		title= title
+
+		meta(charset='utf-8')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+
+		link(rel='stylesheet', href='/stylesheets/style.css')
+	body
+		header(class='navbar navbar-default navbar-static-top bs-docs-nav', role='banner')
+			.container
+				.separator
+					.navbar-header
+						button(class='navbar-toggle', type='button', data-toggle='collapse', data-target='.bs-navbar-collapse')
+							span.sr-only Toggle navigation
+							span.icon-bar
+							span.icon-bar
+							span.icon-bar
+						a(href='../', class='navbar-brand') RelayNovel
+					nav(class='collapse navbar-collapse bs-navbar-collapse', role='navigation')
+						ul.nav.navbar-nav
+							li: a(href='/novels') Novels
+		.container
+			.row
+				.col-md-12
+					block content

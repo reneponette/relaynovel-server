@@ -1,0 +1,15 @@
+{
+	"name": "relaynovel-server",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"start": "node app.js"
+	},
+	"dependencies": {
+		"express": "3.5.0",
+		"jade": "*",
+		"less-middleware": "*",    
+		"async": "^0.2.10",
+		"mysql2": "^0.11.6"
+	}
+}
