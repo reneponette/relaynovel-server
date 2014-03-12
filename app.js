@@ -4,8 +4,6 @@
  */
 
 var express = require('express');
-var routes = require('./routes');
-var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
 var lessMiddleware = require('less-middleware');
@@ -45,8 +43,13 @@ if ('development' == app.get('env')) {
 // 	password: '77977797'
 // }));
 
+var routes = require('./routes');
+var user = require('./routes/user');
+var novel = require('./routes/novel');
+
 app.get('/', routes.index);
 app.get('/users', user.list);
+app.get('/novels', novel.list);
 
 http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));
