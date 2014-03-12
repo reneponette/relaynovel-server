@@ -4,5 +4,18 @@
  */
 
 exports.list = function(req, res){
-  res.render('novel/index', { title: 'Novel List' });
+
+	console.log('req.models = ' + JSON.stringify(req.models));
+
+	req.models.novel.create([
+		{
+			title:'rene'
+		}
+	], function (err, items) {
+			// err - description of the error or null
+			// items - array of inserted items
+	});
+
+	
+	res.render('novel/index', { title: 'Novel List' });
 };

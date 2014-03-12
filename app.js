@@ -7,9 +7,17 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var lessMiddleware = require('less-middleware');
-var mysql = require('mysql2');
+var orm = require('orm');
 
 var app = express();
+
+//db orm setting
+app.use(orm.express("mysql://relaynovel:77977797@localhost/relaynovel", {
+	define: function (db, models, next) {
+		models.novel = require('./models/novel')(db);
+		next();
+	}
+}));
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -25,23 +33,17 @@ app.use(lessMiddleware(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, '/bower_components')));
 
+
 // development only
 if ('development' == app.get('env')) {
 	app.use(express.errorHandler({
-	dumpExceptions: true,
-	showStack: true
+		dumpExceptions: true,
+		showStack: true
 	}));
 	app.set('mysql_host', 'localhost');
 } else {
 	app.set('mysql_host', '');
 }
-
-// app.set('mysql', mysql.createConnection({
-// 	host: app.get('mysql_host'),
-// 	port: 3307,
-// 	user: 'relaynovel',
-// 	password: '77977797'
-// }));
 
 var routes = require('./routes');
 var user = require('./routes/user');

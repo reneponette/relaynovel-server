@@ -1,15 +1,16 @@
 {
-	"name": "relaynovel-server",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "node app.js"
-	},
-	"dependencies": {
-		"express": "3.5.0",
-		"jade": "*",
-		"less-middleware": "*",    
-		"async": "^0.2.10",
-		"mysql2": "^0.11.6"
-	}
+  "name": "relaynovel-server",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.5.0",
+    "jade": "*",
+    "less-middleware": "*",
+    "async": "^0.2.10",
+    "orm": "^2.1.3",
+    "mysql": "^2.1.0"
+  }
 }
