@@ -1,5 +1,21 @@
-extends ../layout
+extends ../login_info
 
 block content
-  h1= title
-  p Welcome to #{title}
+	.panel.panel-default
+		.panel-heading
+			if session.user
+				a(href='/novels/new'): buttton.btn.btn-default.pull-right New			
+			h3= title
+		.panel-body
+			table.table.table-striped
+				thead
+					tr
+						th title
+						th type
+
+				tbody
+					each novel in novels
+						tr
+							td: a(href='/novels/#{novel._id}') #{novel.title}
+							td=novel.type
+

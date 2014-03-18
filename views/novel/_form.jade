@@ -1,0 +1,20 @@
+extends ../login_info
+
+block content
+	.panel.panel-default
+		.panel-heading
+			h3= title
+		.panel-body
+			form(action='/novels/create', method='post', class='col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-3')
+				.form-group
+					label title
+					input(class='form-control', type='text', name='title')
+				.form-group
+					label chapter title
+					input(class='form-control', type='text', name='chapter')
+				.form-group
+					label script
+					input(class='form-control', type='text', name='script')							
+				.form-actions
+					input(class='btn btn-default', name='commit', type='submit', value='create')
+					a(class='btn', href='/novels') Cancel

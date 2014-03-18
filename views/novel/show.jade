@@ -1,0 +1,10 @@
+extends ../login_info
+
+block content
+	.panel.panel-default
+		.panel-heading
+			h3=novel.title
+			h4=branch.title
+		.panel-body
+			each s in scripts
+				span=s.text
