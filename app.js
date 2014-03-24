@@ -3,10 +3,18 @@
  * Module dependencies.
  */
 
+var config = require('./config');
+
 var express = require('express');
+var routes = require('./routes');
+var user = require('./routes/user');
+var novel = require('./routes/novel');
+
 var http = require('http');
 var path = require('path');
-var lessMiddleware = require('less-middleware');
+var mongoose = require('mongoose');
+// var logger = require('./lib/logger').logger;
+var log4js = require('log4js');
 
 var app = express();
 
@@ -15,7 +23,8 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon());
-app.use(express.logger('dev'));
+// app.use(express.logger('dev'));
+app.use(log4js.connectLogger(require('./lib/logger').access, { level: 'auto' }));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
@@ -26,7 +35,7 @@ app.use(function(req,res,next){
     next();
 });
 app.use(app.router);
-app.use(lessMiddleware(path.join(__dirname, '/public')));
+app.use(require('less-middleware')(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, '/bower_components')));
 
@@ -37,15 +46,10 @@ if ('development' == app.get('env')) {
 		dumpExceptions: true,
 		showStack: true
 	}));
-	app.set('mysql_host', 'localhost');
-} else {
-	app.set('mysql_host', '');
 }
 
-
 //mongodb
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/relaynovel');
+mongoose.connect(config.db.host);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
@@ -53,16 +57,14 @@ db.once('open', function callback () {
 });
 
 
-var routes = require('./routes');
-var user = require('./routes/user');
-var novel = require('./routes/novel');
-
 app.get('/', routes.index);
+
 //users
 app.get('/users', user.list);
 app.post('/users/create', user.create);
 app.post('/users/login', user.login);
 app.get('/users/logout', user.logout);
+
 //novels
 app.get('/novels', novel.list);
 app.get('/novels/new', novel.new);

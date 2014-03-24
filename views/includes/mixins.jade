@@ -1,0 +1,5 @@
+mixin link(href, name)
+  a(class!=attributes.class, href=href)= name
+
+mixin bsButton(name)
+  button(type='button', class='btn ' + attributes.class, id=attributes.id, style=attributes.style)= name

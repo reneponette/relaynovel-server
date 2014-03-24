@@ -1,0 +1,12 @@
+if !session.user
+	form(action='/users/login' method='post' class='navbar-form navbar-right', role='login')
+		input(type='text', name='nickname' class='form-control', placeholder='nickname')
+		input(type='password', name='password' class='form-control', placeholder='password')
+		button(type='submit', class='btn btn-default') SignIn	
+
+else
+	form(action='/users/logout', method='get' class='navbar-form navbar-right', role='login')
+		.form-group			
+			span #{session.user.nickname}&nbsp			
+				button(type='submit', class='btn btn-default') SignOut
+
