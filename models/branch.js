@@ -2,11 +2,11 @@ var mongoose = require('mongoose');
 
 
 var schema = mongoose.Schema({
-	novel: mongoose.Schema.Types.ObjectId,
+  owner_id: mongoose.Schema.Types.ObjectId,  
+	novel_id: mongoose.Schema.Types.ObjectId,
 	chapter: {type: Number, default: 1},
-	p_branch: mongoose.Schema.Types.ObjectId, //parent branch
-	p_script: mongoose.Schema.Types.ObjectId, //parent script
-	owner: mongoose.Schema.Types.ObjectId,
+	p_branch_id: mongoose.Schema.Types.ObjectId, //parent branch
+	p_script_id: mongoose.Schema.Types.ObjectId, //parent script
   title: String,
   scripts: Array,
   type: {type: String, default:'private'},

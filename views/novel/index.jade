@@ -11,11 +11,13 @@ block content
 				thead
 					tr
 						th title
+						th owner
 						th type
 
 				tbody
 					each novel in novels
 						tr
 							td: a(href='/novels/#{novel._id}') #{novel.title}
+							td=novel.owner_id
 							td=novel.type
 

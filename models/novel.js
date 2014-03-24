@@ -2,14 +2,14 @@ var mongoose = require('mongoose');
 
 
 var schema = mongoose.Schema({
-	owner: mongoose.Schema.Types.ObjectId,
-    title: String,
-    type: {type: String, default: 'private'},
-    vote: {type: Number, default: 0},
-    synop: String,
-    t_branch: mongoose.Schema.Types.ObjectId,
-	  created_at: {type: Date, default: Date.now},
-	  updated_at: {type: Date, default: Date.now},
+	owner_id: mongoose.Schema.Types.ObjectId,
+  title: String,
+  type: {type: String, default: 'private'},
+  vote: {type: Number, default: 0},
+  synop: String,
+  t_branch_id: mongoose.Schema.Types.ObjectId,
+  created_at: {type: Date, default: Date.now},
+  updated_at: {type: Date, default: Date.now},
 });
 
 
