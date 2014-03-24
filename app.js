@@ -72,8 +72,11 @@ app.get('/novels/new', novel.new);
 app.post('/novels/create', novel.create);
 app.get('/novels/:novel_id', novel.show);
 
+//branches
+app.get('/branches/:branch_id', branch.show);
+app.post('/branches/:branch_id/write', branch.write);
 
-app.post('/novels/:novel_id/branches/:branch_id/write', branch.write);
+
 
 http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));

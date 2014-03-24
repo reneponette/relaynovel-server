@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+	.panel.panel-default
+		.panel-heading
+			h2 제목: #{novel.title}
+		.panel-body
+			h4 챕터: #{branch.title}
+			.well
+				each s in scripts
+					a(href='#') &nbsp#{s.text}
+		.panel-footer
+			form(role='form', method='post', action='/branches/#{branch._id}/write')
+				.form-group
+					textarea(class='form-control', rows='5', name='text')
+				button(type='submit', class='btn btn-default') 작성

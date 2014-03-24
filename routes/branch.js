@@ -21,6 +21,46 @@ exports.list = function(req, res, next) {
 	});	
 };
 
+exports.show = function(req, res, next) {
+	var branch_id = req.params.branch_id;
+
+
+	async.waterfall([
+		function(callback) {
+			Branch.findById(branch_id, function(err, branch) {
+				if (err) return callback(err);
+
+				callback(null, branch);
+			});
+		},
+		function(branch, callback) {
+			Novel.findById(branch.novel_id, function (err, novel) {
+				if (err) return callback(err);
+
+				callback(null, branch, novel);
+			});			
+		},
+		function(branch, novel, callback) {
+			Script.find({p_branch_id:branch._id}, function(err, scripts) {
+				if (err) return callback(err);
+				
+				res.render('branch/show', {
+					novel: novel,
+					branch: branch,
+					scripts: scripts
+				});
+			});
+		}
+	],
+	function(err, results){
+		if(err) {
+			console.log(err);
+			return next(err);
+		}
+	});
+
+}
+
 
 exports.write = function(req, res, next) {
 
@@ -28,7 +68,6 @@ exports.write = function(req, res, next) {
 		return next('로그인해라');
 	}
 
-	var novel_id = req.params.novel_id;
 	var branch_id = req.params.branch_id;
 	var text = req.body.text;	
 	console.log('text = ' + text);
@@ -75,7 +114,7 @@ exports.write = function(req, res, next) {
 	],
 	function(err, results){
 		if(err) return next(err);
-		res.redirect('/novels/'+novel_id);
+		res.redirect('/branches/'+branch_id);
 	});
 }
 
