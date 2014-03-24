@@ -18,6 +18,6 @@ block content
 					each novel in novels
 						tr
 							td: a(href='/novels/#{novel._id}') #{novel.title}
-							td=novel.owner_id
+							td=novel.owner.nickname
 							td=novel.type
 

@@ -11,14 +11,14 @@ var logger = require('../lib/logger').trace;
 
 exports.list = function(req, res, next) {
 
-	Novel.find({}, function(err, docs) {
+	Novel.getNovels({}, function(err, novels) {
 		if(err) return next(err);
 
 		res.render('novel/index', {
 			title: 'Novel List',
-			novels: docs
+			novels: novels
 		});
-	});
+	});	
 };
 
 
