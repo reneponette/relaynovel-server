@@ -40,7 +40,7 @@ exports.write = function(req, res, next) {
 		},
 
 		function(user, callback) {
-			Branch.findById(branch_id, function(err, branch) {
+			Branch.findById(branch_id).populate('owner').exec(function(err, branch) {
 				if(err) return callback(err);
 				callback(null, user, branch);
 			})
@@ -48,9 +48,9 @@ exports.write = function(req, res, next) {
 		// 실제 로직....
 		function(user, branch, callback) {
 
-			// if(branch.type === 'private' && branch.owner_id !== user._id) {
-			// 	return callback('넌 권한이 없어');
-			// }
+			if(branch.isWritable(user)) {
+				return callback('넌 권한이 없어');
+			}
 
 			var script = new Script({text:text});
 			script.owner = user;
@@ -71,6 +71,37 @@ exports.write = function(req, res, next) {
 	function(err, results){
 		if(err) return next(err);
 		res.redirect('/branches/'+branch_id);
+	});
+}
+
+
+
+
+exports.close = function(req, res, next) {
+	if(req.session.user == null) {
+		return next('로그인해라');
+	}
+
+	var branch_id = req.params.branch_id;	
+	Branch.findById(branch_id).populate('owner scripts').exec(function(err, branch) {
+		if(err) return next(err);
+		if(!branch.isMine(req.session.user)) return next('권한이 업씀.');
+
+		var scripts = branch.scripts;
+		var lastScript = scripts[scripts.length-1];
+		logger.info('lastScript = ' + lastScript);
+
+		lastScript.type = 'close';
+		lastScript.save(function(err) {
+			if(err) return next(err);
+		});
+
+		branch.closed = true;
+		branch.save(function(err) {
+			if(err) return next(err);
+		});
+
+		res.redirect('/branches/'+branch_id);		
 	});
 }
 

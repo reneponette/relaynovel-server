@@ -76,6 +76,7 @@ app.post('/novels/create', novel.create);
 //branches
 app.get('/branches/:branch_id', branch.show);
 app.post('/branches/:branch_id/write', branch.write);
+app.post('/branches/:branch_id/close', branch.close);
 
 //scripts
 app.get('/scripts/:script_id', script.show);

@@ -5,7 +5,7 @@ block content
 		.panel-heading
 			h2=branch.novel.title
 		.panel-body
-			h4.pull-left #{branch.chapter}. #{branch.title}
+			h4.pull-left #{branch.chapter}. #{branch.title} #{branch.closed ? '(완)' : ''}
 			h4.pull-right #{branch.owner.nickname}
 			.clearfix
 			.well.scripts
@@ -17,12 +17,30 @@ block content
 								a(class='branch', href='/branches/#{b}')&nbsp#
 						span &nbsp}
 
-			if(session.user != null && branch.owner._id+'' == session.user._id)
-				button(type='button', class='btn btn-default') close chapter
-
+			if(branch.isMine(session.user))
+				if(!branch.closed)
+					form(id='close_branch_form' role='form', method='post', action='/branches/#{branch._id}/close')
+						button(id='close_branch_btn' type='submit', class='btn btn-default') close chapter
 
 		.panel-footer
-			form(role='form', method='post', action='/branches/#{branch._id}/write')
+			form(id='write_form' role='form', method='post', action='/branches/#{branch._id}/write')
 				.form-group
-					textarea(class='form-control', rows='5', name='text')
-				button(type='submit', class='btn btn-default') 작성
+					textarea(class='form-control', rows='5', name='text', placeholder='#{branch.closed ? "완결된 챕터라 여기다 쓰면 자동으로 다음 챕터를 생성하고 이어씀." : ""}')
+				button(id='write_btn' type='submit', class='btn btn-default') 작성
+
+	script.
+		$(document).ready(function() {
+			$('#close_branch_btn').click(function(e) {
+				e.preventDefault();
+				var ret = confirm('브랜치는 한번 닫으면 다시 열 수 없는데... 그래도 할꺼임?');
+				if(ret)
+					$('#close_branch_form').submit();
+			});
+
+			$('#write_btn').click(function(e) {
+				e.preventDefault();
+				var ret = confirm('다음 챕터에 이어 쓸거임?');
+				if(ret)
+					$('#write_form').submit();
+			});
+		});

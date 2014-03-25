@@ -6,6 +6,7 @@ var schema = Schema({
 	t_branch: {type: Schema.Types.ObjectId,	ref: 'Branch'},
   title: String,
   synop: String,
+  closed: Boolean,
   type: {type: String, default: 'private'},
   vote: {type: Number, default: 0},
   created_at: {type: Date, default: Date.now},
