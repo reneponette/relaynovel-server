@@ -17,7 +17,7 @@ block content
 				tbody
 					each novel in novels
 						tr
-							td: a(href='/branches/#{novel.t_branch}') #{novel.title}
+							td: a(href='/novels/#{novel._id}/branches/#{novel.t_branch_id}') #{novel.title}
 							td=novel.owner.nickname
 							td=novel.type
 

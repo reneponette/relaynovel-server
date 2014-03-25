@@ -1,14 +1,15 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 
-var schema = mongoose.Schema({
-  owner_id: mongoose.Schema.Types.ObjectId,  
-	novel_id: mongoose.Schema.Types.ObjectId,
+var schema = Schema({
+  owner: {type: Schema.Types.ObjectId, ref: 'User'},
+	novel: {type: Schema.Types.ObjectId, ref: 'Novel'},
 	chapter: {type: Number, default: 1},
-	p_branch_id: mongoose.Schema.Types.ObjectId, //parent branch
-	p_script_id: mongoose.Schema.Types.ObjectId, //parent script
+	p_branch: {type: Schema.Types.ObjectId, ref: 'Branch'}, //parent branch
+	p_script: {type: Schema.Types.ObjectId, ref: 'Script'}, //parent script
   title: String,
-  scripts: Array,
+  scripts: [{type: Schema.Types.ObjectId, ref: 'Script'}],
   type: {type: String, default:'private'},
   closed: {type: Boolean, default: false},
   created_at: {type: Date, default: Date.now},

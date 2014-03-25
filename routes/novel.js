@@ -11,7 +11,7 @@ var logger = require('../lib/logger').trace;
 
 exports.list = function(req, res, next) {
 
-	Novel.getNovels({}, function(err, novels) {
+	Novel.find().populate('owner').exec(function(err, novels) {
 		if(err) return next(err);
 
 		res.render('novel/index', {
@@ -58,15 +58,15 @@ exports.create = function(req, res, next) {
 			var branch = new Branch({title:chapter_title});
 			var script = new Script({text:script});
 
-			novel.owner_id = user;
-			novel.t_branch_id = branch;
+			novel.owner = user;
+			novel.t_branch = branch;
 
-			branch.owner_id = user;
-			branch.novel_id = novel;
+			branch.owner = user;
+			branch.novel = novel;
 			branch.scripts.push(script._id);
 
-			script.owner_id = user;
-			script.p_branch_id = branch;
+			script.owner = user;
+			script.p_branch = branch;
 
 			novel.save(function(err) {
 				if(err) return callback(err);
@@ -88,38 +88,38 @@ exports.create = function(req, res, next) {
 }
 
 
-exports.show = function(req, res, next) {
-	var novel_id = req.params.novel_id;
+// exports.show = function(req, res, next) {
+// 	var novel_id = req.params.novel_id;
 
-	async.waterfall([
-		function(callback) {
-			Novel.findById(novel_id, function (err, novel) {
-				if (err) return callback(err);
-				callback(null, novel);
-			});
-		},
-		function(novel, callback) {
-			Branch.findById(novel.t_branch_id, function(err, branch) {
-				if (err) return callback(err);
-				callback(null, novel, branch);
-			});
-		},
-		function(novel, branch, callback) {
-			Script.find({p_branch_id:branch._id}, function(err, scripts) {
-				if (err) return callback(err);
+// 	async.waterfall([
+// 		function(callback) {
+// 			Novel.findById(novel_id, function (err, novel) {
+// 				if (err) return callback(err);
+// 				callback(null, novel);
+// 			});
+// 		},
+// 		function(novel, callback) {
+// 			Branch.findById(novel.t_branch_id, function(err, branch) {
+// 				if (err) return callback(err);
+// 				callback(null, novel, branch);
+// 			});
+// 		},
+// 		function(novel, branch, callback) {
+// 			Script.find({p_branch_id:branch._id}, function(err, scripts) {
+// 				if (err) return callback(err);
 				
-				res.render('novel/show', {
-					novel: novel,
-					branch: branch,
-					scripts: scripts
-				});
-			});
-		}
-	],
-	function(err, results){
-		if(err) {
-			console.log(err);
-			return next(err);
-		}
-	});
-}
+// 				res.render('novel/show', {
+// 					novel: novel,
+// 					branch: branch,
+// 					scripts: scripts
+// 				});
+// 			});
+// 		}
+// 	],
+// 	function(err, results){
+// 		if(err) {
+// 			console.log(err);
+// 			return next(err);
+// 		}
+// 	});
+// }

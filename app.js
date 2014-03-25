@@ -10,6 +10,7 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var novel = require('./routes/novel');
 var branch = require('./routes/branch');
+var script = require('./routes/script');
 
 var http = require('http');
 var path = require('path');
@@ -70,11 +71,16 @@ app.get('/users/logout', user.logout);
 app.get('/novels', novel.list);
 app.get('/novels/new', novel.new);
 app.post('/novels/create', novel.create);
-app.get('/novels/:novel_id', novel.show);
+// app.get('/novels/:novel_id', novel.show);
 
 //branches
 app.get('/branches/:branch_id', branch.show);
 app.post('/branches/:branch_id/write', branch.write);
+
+//scripts
+app.get('/scripts/:script_id', script.show);
+app.post('/scripts/:script_id/write', script.write);
+
 
 
 

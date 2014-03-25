@@ -3,12 +3,24 @@ extends ../layout
 block content
 	.panel.panel-default
 		.panel-heading
-			h2 제목: #{novel.title}
+			h2=branch.novel.title
 		.panel-body
-			h4 챕터: #{branch.title}
-			.well
-				each s in scripts
-					a(href='#') &nbsp#{s.text}
+			h4.pull-left #{branch.chapter}. #{branch.title}
+			h4.pull-right #{branch.owner.nickname}
+			.clearfix
+			.well.scripts
+				each s in branch.scripts
+					a(class='script', href='/scripts/#{s._id}') &nbsp#{s.text}
+					if(s.type == 'branch')
+						span {
+							each b in s.branches
+								a(class='branch', href='/branches/#{b}')&nbsp#
+						span &nbsp}
+
+			if(session.user != null && branch.owner._id+'' == session.user._id)
+				button(type='button', class='btn btn-default') close chapter
+
+
 		.panel-footer
 			form(role='form', method='post', action='/branches/#{branch._id}/write')
 				.form-group

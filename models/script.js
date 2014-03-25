@@ -1,12 +1,12 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-
-var schema = mongoose.Schema({
-	owner_id: mongoose.Schema.Types.ObjectId,
-	p_branch_id: mongoose.Schema.Types.ObjectId,
+var schema = Schema({
+	owner: {type: Schema.Types.ObjectId, ref: 'User'},
+	p_branch: {type: Schema.Types.ObjectId, ref: 'Branch'},
   type: {type: String, default: 'text'}, //text, close, branch
   text: String,
-  branches: Array,
+  branches: [{type: Schema.Types.ObjectId, ref: 'Branch'}],
   report: Number,
   created_at: {type: Date, default: Date.now},
 });

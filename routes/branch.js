@@ -5,62 +5,22 @@ var Script = require('../models/Script');
 var async = require('async');
 var logger = require('../lib/logger').trace;
 
-/*
- * GET novel list.
- */
 
-exports.list = function(req, res, next) {
-
-	Novel.getNovels({}, function(err, novels) {
-		if(err) return next(err);
-
-		res.render('novel/index', {
-			title: 'Novel List',
-			novels: novels
-		});
-	});	
-};
 
 exports.show = function(req, res, next) {
 	var branch_id = req.params.branch_id;
 
-
-	async.waterfall([
-		function(callback) {
-			Branch.findById(branch_id, function(err, branch) {
-				if (err) return callback(err);
-
-				callback(null, branch);
-			});
-		},
-		function(branch, callback) {
-			Novel.findById(branch.novel_id, function (err, novel) {
-				if (err) return callback(err);
-
-				callback(null, branch, novel);
-			});			
-		},
-		function(branch, novel, callback) {
-			Script.find({p_branch_id:branch._id}, function(err, scripts) {
-				if (err) return callback(err);
-				
-				res.render('branch/show', {
-					novel: novel,
-					branch: branch,
-					scripts: scripts
-				});
-			});
-		}
-	],
-	function(err, results){
-		if(err) {
-			console.log(err);
-			return next(err);
-		}
+	Branch.findById(branch_id).populate('novel scripts owner').exec(function(err, branch) {
+		if (err) return next(err);
+		res.render('branch/show', {branch: branch});
 	});
-
 }
 
+
+/*
+ * 브랜치 끝에 스크립트를 추가함
+ * 만약 마지막 스크립트가 close 상태라면 챕터를 올리고 브랜치 새로따고 추가
+ */
 
 exports.write = function(req, res, next) {
 
@@ -69,8 +29,7 @@ exports.write = function(req, res, next) {
 	}
 
 	var branch_id = req.params.branch_id;
-	var text = req.body.text;	
-	console.log('text = ' + text);
+	var text = req.body.text;		
 
 	async.waterfall([
 		function(callback) {
@@ -86,19 +45,16 @@ exports.write = function(req, res, next) {
 				callback(null, user, branch);
 			})
 		},
-
+		// 실제 로직....
 		function(user, branch, callback) {
-
-			console.log('owner_id = ' + branch.owner_id)
-			console.log('user_id = ' + user._id)
 
 			// if(branch.type === 'private' && branch.owner_id !== user._id) {
 			// 	return callback('넌 권한이 없어');
 			// }
 
 			var script = new Script({text:text});
-			script.owner_id = user;
-			script.p_branch_id = branch;
+			script.owner = user;
+			script.p_branch = branch;
 
 			branch.scripts.push(script);
 
