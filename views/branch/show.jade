@@ -32,6 +32,8 @@ block content
 					textarea(class='form-control', rows='5', name='text', placeholder='#{branch.closed ? "완결된 챕터라 여기다 쓰면 자동으로 다음 챕터를 생성하고 이어씀." : ""}')
 				button(id='write_btn' type='submit', class='btn btn-default') 작성
 
+		input(id='close' type='hidden', name='close', value='#{branch.closed ? 1 : 0}')
+
 	script.
 		$(document).ready(function() {
 			$('#close_branch_btn').click(function(e) {
@@ -42,9 +44,12 @@ block content
 			});
 
 			$('#write_btn').click(function(e) {
-				e.preventDefault();
-				var ret = confirm('다음 챕터에 이어 쓸거임?');
-				if(ret)
-					$('#write_form').submit();
+				var close = $('#close').val();
+				if(close == 1) {
+					e.preventDefault();
+					var ret = confirm('다음 챕터에 이어 쓸거임?');
+					if(ret)
+						$('#write_form').submit();
+				}
 			});
 		});

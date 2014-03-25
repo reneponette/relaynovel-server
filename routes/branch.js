@@ -6,13 +6,58 @@ var async = require('async');
 var logger = require('../lib/logger').trace;
 
 
+var traverse_branch = function(target_chapter, branch, orig_branch, array, cb) {
+	if(branch.chapter != target_chapter)
+		return;
+
+	if(branch.p_branch == null) {
+		array.push(branch);
+		if(branch == orig_branch) cb(null, array);		
+		return
+	}
+
+	Branch.findById(branch.p_branch).populate('scripts').exec(function(err, parent) {
+		if(err==null && parent != null) {
+			traverse_branch(target_chapter, parent, orig_branch, array, cb);
+		}
+
+		array.push(branch);
+		if(branch == orig_branch) cb(null, array);
+	});
+}
+
 
 exports.show = function(req, res, next) {
 	var branch_id = req.params.branch_id;
 
 	Branch.findById(branch_id).populate('novel scripts owner').exec(function(err, branch) {
 		if (err) return next(err);
-		res.render('branch/show', {branch: branch});
+
+		traverse_branch(branch.chapter, branch, branch, [], function(err, branches) {
+
+			var mergedScripts = [];
+
+			for(var i in branches) {
+				var b = branches[i];
+				var bNext = branches[i+1];
+
+				for(var j in b.scripts) {
+					var s = b.scripts[j];
+
+					mergedScripts.push(s);
+
+					//마지막 브랜치일 경우 그냥 모든 스크립트 추가
+					if(bNext == null) continue;
+
+					if(s._id+'' == bNext.p_script._id+'') break;
+				}
+			}
+
+			logger.info('mergedScripts = ' + mergedScripts);
+
+			res.render('branch/show', {branch: branch, scripts:mergedScripts});
+
+		});
 	});
 }
 
@@ -79,7 +124,7 @@ exports.write = function(req, res, next) {
 				});
 
 			} else {
-				
+
 				newScript.p_branch = branch;
 				branch.scripts.push(newScript);
 				branch.save(function(err) {
