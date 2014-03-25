@@ -40,7 +40,7 @@ exports.write = function(req, res, next) {
 		},
 
 		function(user, callback) {
-			Branch.findById(branch_id).populate('owner').exec(function(err, branch) {
+			Branch.findById(branch_id).populate('owner scripts').exec(function(err, branch) {
 				if(err) return callback(err);
 				callback(null, user, branch);
 			})
@@ -48,24 +48,50 @@ exports.write = function(req, res, next) {
 		// 실제 로직....
 		function(user, branch, callback) {
 
-			if(branch.isWritable(user)) {
+			if(!branch.isWritable(user)) {
 				return callback('넌 권한이 없어');
 			}
 
-			var script = new Script({text:text});
-			script.owner = user;
-			script.p_branch = branch;
+			var newScript = new Script({text:text});
+			newScript.owner = user;
 
-			branch.scripts.push(script);
+			if(branch.closed) {
 
-			script.save(function(err) {
+				var scripts = branch.scripts;
+				var lastScript = scripts[scripts.length-1];
+
+				var newBranch = new Branch();
+				newBranch.owner = user;
+				newBranch.novel = branch.novel;
+				newBranch.p_branch = branch;
+				newBranch.p_script = lastScript;
+				newBranch.chapter = branch.chapter+1;
+
+				lastScript.branches.push(newBranch);
+				lastScript.save(function(err) {
+					if(err) return next(err);
+				});				
+
+				newScript.p_branch = newBranch;
+				newBranch.scripts.push(newScript);
+				newBranch.save(function(err) {
+					if(err) return callback(err);
+				});
+
+			} else {
+				
+				newScript.p_branch = branch;
+				branch.scripts.push(newScript);
+				branch.save(function(err) {
+					if(err) return callback(err);
+				});
+			}
+
+			newScript.save(function(err) {
 				if(err) return callback(err);
 			});
-			branch.save(function(err) {
-				if(err) return callback(err);
-			});
 
-			callback(null);
+			callback(null);			
 		}
 	],
 	function(err, results){

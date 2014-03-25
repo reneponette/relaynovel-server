@@ -11,7 +11,7 @@ block content
 			.well.scripts
 				each s in branch.scripts
 					a(class='script', href='/scripts/#{s._id}') &nbsp#{s.text}
-					if(s.type == 'branch')
+					if(s.type == 'branch' || s.type == 'close')
 						span {
 							each b in s.branches
 								a(class='branch', href='/branches/#{b}')&nbsp#
@@ -21,6 +21,10 @@ block content
 				if(!branch.closed)
 					form(id='close_branch_form' role='form', method='post', action='/branches/#{branch._id}/close')
 						button(id='close_branch_btn' type='submit', class='btn btn-default') close chapter
+
+			ul.pager
+				li(class='previous'): a(href='#') &larr; 이전챕터
+				li(class='next'): a(href='#') 다음챕터 &rarr;
 
 		.panel-footer
 			form(id='write_form' role='form', method='post', action='/branches/#{branch._id}/write')

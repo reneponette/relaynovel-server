@@ -26,7 +26,7 @@ schema.methods.isMine = function(user) {
 schema.methods.isWritable = function(user) {
   if(user == null) return false;
 
-  return branch.type != 'private' || this.owner._id+'' == user._id+'';
+  return this.type != 'private' || this.owner._id+'' == user._id+'';
 }
 
 module.exports = mongoose.model('Branch', schema);
