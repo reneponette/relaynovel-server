@@ -3,13 +3,18 @@ extends ../layout
 block content
 	.panel.panel-default
 		.panel-heading
-			h2=branch.novel.title
+			h2.pull-left=branch.novel.title
+			.pull-right
+				h4=branch.novel.type
+			.clearfix
 		.panel-body
 			h4.pull-left #{branch.chapter}. #{branch.title} #{branch.closed ? '(완)' : ''}
-			h4.pull-right #{branch.owner.nickname}
+			.pull-right
+				h4.text-right=branch.type
+				h4.text-right=branch.owner.nickname
 			.clearfix
 			.well.scripts
-				each s in branch.scripts
+				each s in scripts
 					a(class='script', href='/scripts/#{s._id}') &nbsp#{s.text}
 					if(s.type == 'branch' || s.type == 'close')
 						span {

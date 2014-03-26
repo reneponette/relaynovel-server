@@ -6,23 +6,25 @@ var async = require('async');
 var logger = require('../lib/logger').trace;
 
 
-var traverse_branch = function(target_chapter, branch, orig_branch, array, cb) {
-	if(branch.chapter != target_chapter)
+var traverse_branch = function(target_chapter, branch, orig_branch, cb) {
+
+	if(branch.chapter != target_chapter) {
+		cb(null, []);
 		return;
+	}
 
 	if(branch.p_branch == null) {
-		array.push(branch);
-		if(branch == orig_branch) cb(null, array);		
+		cb(null, [branch]);	
 		return
 	}
 
 	Branch.findById(branch.p_branch).populate('scripts').exec(function(err, parent) {
 		if(err==null && parent != null) {
-			traverse_branch(target_chapter, parent, orig_branch, array, cb);
+			traverse_branch(target_chapter, parent, orig_branch, function(err, array) {
+				array.push(branch);
+				cb(null, array);				
+			});
 		}
-
-		array.push(branch);
-		if(branch == orig_branch) cb(null, array);
 	});
 }
 
@@ -30,14 +32,14 @@ var traverse_branch = function(target_chapter, branch, orig_branch, array, cb) {
 exports.show = function(req, res, next) {
 	var branch_id = req.params.branch_id;
 
-	Branch.findById(branch_id).populate('novel scripts owner').exec(function(err, branch) {
+	Branch.findById(branch_id).populate('novel owner scripts').exec(function(err, branch) {
 		if (err) return next(err);
 
-		traverse_branch(branch.chapter, branch, branch, [], function(err, branches) {
+		traverse_branch(branch.chapter, branch, branch, function(err, branches) {
 
 			var mergedScripts = [];
 
-			for(var i in branches) {
+			for(var i=0 ; i<branches.length ; i++) {
 				var b = branches[i];
 				var bNext = branches[i+1];
 
@@ -47,16 +49,13 @@ exports.show = function(req, res, next) {
 					mergedScripts.push(s);
 
 					//마지막 브랜치일 경우 그냥 모든 스크립트 추가
-					if(bNext == null) continue;
+					if(bNext === undefined) continue;
 
-					if(s._id+'' == bNext.p_script._id+'') break;
+					if(s._id+'' == bNext.p_script+'') break;
 				}
 			}
 
-			logger.info('mergedScripts = ' + mergedScripts);
-
 			res.render('branch/show', {branch: branch, scripts:mergedScripts});
-
 		});
 	});
 }
