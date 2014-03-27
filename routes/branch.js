@@ -6,100 +6,35 @@ var async = require('async');
 var logger = require('../lib/logger').trace;
 
 
-var traverse_branch = function(target_chapter, branch, orig_branch, cb) {
-
-	if(branch.chapter != target_chapter) {
-		cb(null, []);
-		return;
-	}
-
-	if(branch.p_branch == null) {
-		cb(null, [branch]);	
-		return
-	}
-
-	Branch.findById(branch.p_branch).populate('scripts').exec(function(err, parent) {
-		if(err==null && parent != null) {
-			traverse_branch(target_chapter, parent, orig_branch, function(err, array) {
-				array.push(branch);
-				cb(null, array);				
-			});
-		}
-	});
-}
-
-var populate_scripts = function(branches) {
-	var scripts = [];
-
-	for(var i=0 ; i<branches.length ; i++) {
-		var b = branches[i];
-		var bNext = branches[i+1];
-
-		for(var j in b.scripts) {
-			var s = b.scripts[j];
-			scripts.push(s);
-			//마지막 브랜치일 경우 그냥 모든 스크립트 추가
-			if(bNext === undefined) continue;
-			//다음 브랜치로 이동...
-			if(s._id+'' == bNext.p_script+'') break;
-		}
-	}
-	return scripts;
-}
-
-var make_title = function(branches) {
-	if(branches == null || branches.length == 0)
-		return '';
-
-	var title = '';
-	for(var i=0 ; i<branches.length ; i++) {
-		var b = branches[i];
-		var bNext = branches[i+1];
-
-		if(i==0) {
-			title = b.chapter + '. ' + b.title;
-		}	
-
-		if(bNext === undefined) break;
-
-		for(var j=0 ; j<b.scripts.length ; j++) {
-			var s = b.scripts[j];
-
-			//다음 브랜치가 이전 브랜치의 몇번째 스크립트의 브랜치인지...
-			if(s._id+'' == bNext.p_script+'') {
-				title += ('-(' + (j+1) + ':');
-
-				//다음 브랜치가 해당 스크립트의 몇번쨰 브랜치인지...
-				for(var k=0 ; s.branches.length ; k++) {
-					var sb  = s.branches[k];
-					if(sb+'' == bNext._id+'') {
-						title += ((k+1) + ')');
-						break;
-					}
-				}
-				break;
-			}
-		}
-	}
-	return title;
-}
-
-
 exports.show = function(req, res, next) {
 	var branch_id = req.params.branch_id;
 
-	Branch.findById(branch_id).populate('novel owner scripts').exec(function(err, branch) {
-		if (err) return next(err);
-
-		//ex) 1.시작:$13-#3
-
-		traverse_branch(branch.chapter, branch, branch, function(err, branches) {
-			var scripts = populate_scripts(branches);
-			res.render('branch/show', {
-				branch: branch, 
-				scripts:scripts, 
-				title:make_title(branches)
+	async.waterfall([
+		function(callback) {
+			Branch.findById(branch_id).populate('novel owner scripts').exec(function(err, branch) {
+				if (err) return callback(err);
+				callback(null, branch);
+			});			
+		},
+		function(branch, callback) {
+			branch.chapterScripts(function(err, scripts) {
+				if (err) return callback(err);
+				callback(null, branch, scripts);
 			});
+		},
+		function(branch, scripts, callback) {
+			branch.chapterTitle(function(err, title) {
+				if (err) return callback(err);
+				callback(null, branch, scripts, title);
+			});
+		}
+	], function(err, branch, scripts, title) {
+		if(err) next(err);
+
+		res.render('branch/show', {
+			branch: branch, 
+			scripts:scripts,
+			title:title
 		});
 	});
 }

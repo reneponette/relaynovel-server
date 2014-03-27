@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+var logger = require('../lib/logger').trace;
 
+var Schema = mongoose.Schema;
 
 var schema = Schema({
   owner: {type: Schema.Types.ObjectId, ref: 'User'},
@@ -34,66 +35,97 @@ schema.methods.isWritable = function(user) {
   return this.type != 'private' || this.owner._id+'' == user._id+'';
 }
 
-// schema.methods.chapterBranches = function(cb) {
-//   traverseBranch(this, this, function(err, array) {
-//     if(err) return cb(err);
-//     cb(null, array);
-//   });
-// }
 
 
-// var traverseBranch = function(branch, orig_branch, cb) {
+//ex) 1.시작:$13-#3
+schema.methods.chapterTitle = function(cb) {
+  this.chapterBranches(function(err, branches) {
+    if(branches == null || branches.length == 0)
+      return cb(null, '');
 
-//   if(branch.chapter != orig_branch.chapter) {
-//     cb(null, []);
-//     return;
-//   }
+    var title = '';
+    for(var i=0 ; i<branches.length ; i++) {
+      var b = branches[i];
+      var bNext = branches[i+1];
 
-//   if(branch.p_branch == null) {
-//     cb(null, [branch]); 
-//     return;
-//   }
+      if(i==0) {
+        title = b.chapter + '. ' + b.title;
+      } 
 
-//   mongoose.model('Branch', schema).findById(branch.p_branch).populate('scripts').exec(function(err, parent) {
-//     if(err==null && parent != null) {
-//       traverseBranch(parent, orig_branch, function(err, array) {
-//         array.push(branch);
-//         cb(null, array);        
-//       });
-//     }
-//   });
-// }
+      if(bNext === undefined) break;
+
+      for(var j=0 ; j<b.scripts.length ; j++) {
+        var s = b.scripts[j];
+        //다음 브랜치가 이전 브랜치의 몇번째 스크립트의 브랜치인지...
+        if(s._id+'' == bNext.p_script+'') {
+          title += ('-(' + (j+1) + ':');
+          //다음 브랜치가 해당 스크립트의 몇번쨰 브랜치인지...
+          for(var k=0 ; s.branches.length ; k++) {
+            var sb  = s.branches[k];
+            if(sb+'' == bNext._id+'') {
+              title += ((k+1) + ')');
+              break;
+            }
+          }
+          break;
+        }
+      }
+    }
+    cb(null, title);
+  });
+}
 
 
-// schema.methods.chapterBranches = function(cb) {
-//   this.traverseBranch(this.target_chapter, function(err, array) {
-//     if(err) return cb(err);
-//     cb(null, array);
-//   });
-// }
+schema.methods.chapterScripts = function(cb) {
+  this.chapterBranches(function(err, branches) {
+    if(err) return cb(err);
 
+    var scripts = [];
 
-// schema.methods.traverseBranch = function(target_chapter, cb) {
+    for(var i=0 ; i<branches.length ; i++) {
+      var b = branches[i];
+      var bNext = branches[i+1];
 
-//   if(this.chapter != target_chapter) {
-//     cb(null, []);
-//     return;
-//   }
+      for(var j=0 ; j<b.scripts.length ; j++) {
+        var s = b.scripts[j];
+        scripts.push(s);
+        //마지막 브랜치일 경우 그냥 모든 스크립트 추가
+        if(bNext === undefined) continue;
+        //다음 브랜치로 이동...
+        if(s._id+'' == bNext.p_script+'') break;
+      }
+    }
+    cb(null, scripts);
+  });
+}
 
-//   if(this.p_branch == null) {
-//     cb(null, [this]); 
-//     return;
-//   }
+schema.methods.chapterBranches = function(cb) {
+  this.traverseBranches(this.chapter, function(err, array) {
+    if(err) return cb(err);
+    cb(null, array);
+  });
+}
 
-//   this.model('Branch').findById(this.p_branch).populate('scripts').exec(function(err, parent) {
-//     if(err==null && parent != null) {
-//       parent.traverseBranch(target_chapter, function(err, array) {
-//         array.push(this);
-//         cb(null, array);        
-//       });
-//     }
-//   });
-// }
+schema.methods.traverseBranches = function(target_chapter, cb) {
+  var thisObj = this;
+
+  if(thisObj.chapter != target_chapter) {
+    cb(null, []);
+    return;
+  }
+  if(thisObj.p_branch == null) {
+    cb(null, [thisObj]);
+    return;
+  }
+  thisObj.model('Branch').findById(this.p_branch).populate('scripts').exec(function(err, parent) {
+    if(err==null && parent != null) {
+      parent.traverseBranches(target_chapter, function(err, array) {
+        array.push(thisObj);
+        cb(null, array);
+      });
+    }
+  });
+}
 
 
 module.exports = mongoose.model('Branch', schema);
