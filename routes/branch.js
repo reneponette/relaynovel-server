@@ -28,6 +28,62 @@ var traverse_branch = function(target_chapter, branch, orig_branch, cb) {
 	});
 }
 
+var populate_scripts = function(branches) {
+	var scripts = [];
+
+	for(var i=0 ; i<branches.length ; i++) {
+		var b = branches[i];
+		var bNext = branches[i+1];
+
+		for(var j in b.scripts) {
+			var s = b.scripts[j];
+			scripts.push(s);
+			//마지막 브랜치일 경우 그냥 모든 스크립트 추가
+			if(bNext === undefined) continue;
+			//다음 브랜치로 이동...
+			if(s._id+'' == bNext.p_script+'') break;
+		}
+	}
+	return scripts;
+}
+
+var make_title = function(branches) {
+	if(branches == null || branches.length == 0)
+		return '';
+
+	var title = '';
+	for(var i=0 ; i<branches.length ; i++) {
+		var b = branches[i];
+		var bNext = branches[i+1];
+
+		if(i==0) {
+			title = b.chapter + '. ' + b.title;
+		}	
+
+		if(bNext === undefined) break;
+
+		for(var j=0 ; j<b.scripts.length ; j++) {
+			var s = b.scripts[j];
+
+			//다음 브랜치가 이전 브랜치의 몇번째 스크립트의 브랜치인지...
+			if(s._id+'' == bNext.p_script+'') {
+				title += ('-(' + (j+1) + ':');
+
+				//다음 브랜치가 해당 스크립트의 몇번쨰 브랜치인지...
+				for(var k=0 ; s.branches.length ; k++) {
+					var sb  = s.branches[k];
+					if(sb+'' == bNext._id+'') {
+						title += ((k+1) + ')');
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+	return title;
+}
+
 
 exports.show = function(req, res, next) {
 	var branch_id = req.params.branch_id;
@@ -35,27 +91,15 @@ exports.show = function(req, res, next) {
 	Branch.findById(branch_id).populate('novel owner scripts').exec(function(err, branch) {
 		if (err) return next(err);
 
+		//ex) 1.시작:$13-#3
+
 		traverse_branch(branch.chapter, branch, branch, function(err, branches) {
-
-			var mergedScripts = [];
-
-			for(var i=0 ; i<branches.length ; i++) {
-				var b = branches[i];
-				var bNext = branches[i+1];
-
-				for(var j in b.scripts) {
-					var s = b.scripts[j];
-
-					mergedScripts.push(s);
-
-					//마지막 브랜치일 경우 그냥 모든 스크립트 추가
-					if(bNext === undefined) continue;
-
-					if(s._id+'' == bNext.p_script+'') break;
-				}
-			}
-
-			res.render('branch/show', {branch: branch, scripts:mergedScripts});
+			var scripts = populate_scripts(branches);
+			res.render('branch/show', {
+				branch: branch, 
+				scripts:scripts, 
+				title:make_title(branches)
+			});
 		});
 	});
 }

@@ -8,7 +8,7 @@ block content
 				h4=branch.novel.type
 			.clearfix
 		.panel-body
-			h4.pull-left #{branch.chapter}. #{branch.title} #{branch.closed ? '(완)' : ''}
+			h4.pull-left #{title} #{branch.closed ? '(완)' : ''}
 			.pull-right
 				h4.text-right=branch.type
 				h4.text-right=branch.owner.nickname
@@ -19,7 +19,8 @@ block content
 					if(s.type == 'branch' || s.type == 'close')
 						span {
 							each b in s.branches
-								a(class='branch', href='/branches/#{b}')&nbsp#
+								a(class='branch #{branch.isSame(b) ? "branch-current" : ""}',
+									href='/branches/#{branch.isSame(b) ? s.p_branch : b}')&nbsp#{branch.isSame(b)?'<-':'#'}
 						span &nbsp}
 
 			if(branch.isMine(session.user))
@@ -34,7 +35,8 @@ block content
 		.panel-footer
 			form(id='write_form' role='form', method='post', action='/branches/#{branch._id}/write')
 				.form-group
-					textarea(class='form-control', rows='5', name='text', placeholder='#{branch.closed ? "완결된 챕터라 여기다 쓰면 자동으로 다음 챕터를 생성하고 이어씀." : ""}')
+					textarea(id='textarea' class='form-control', rows='5', name='text', 
+									placeholder='#{branch.closed ? "완결된 챕터라 여기다 쓰면 자동으로 다음 챕터를 생성하고 이어씀." : ""}')
 				button(id='write_btn' type='submit', class='btn btn-default') 작성
 
 		input(id='close' type='hidden', name='close', value='#{branch.closed ? 1 : 0}')
@@ -49,6 +51,14 @@ block content
 			});
 
 			$('#write_btn').click(function(e) {
+				//스크립트 길이 체크
+				var script = $('#textarea').val();
+				if(script.length == 0) {
+					alert('너무 짧아!');
+					e.preventDefault();
+					return;				
+				}
+
 				var close = $('#close').val();
 				if(close == 1) {
 					e.preventDefault();
@@ -56,5 +66,12 @@ block content
 					if(ret)
 						$('#write_form').submit();
 				}
+			});
+
+			$('#textarea').keypress(function(e) {
+				var code = (e.keyCode ? e.keyCode : e.which);
+				if(code == 13 && e.shiftKey) {
+					$('#write_btn').click();
+				}				
 			});
 		});

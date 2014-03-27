@@ -81,7 +81,8 @@ exports.write = function(req, res, next) {
 				newBranch.title = '새로운 브랜치';
 				newBranch.chapter = script.p_branch.chapter + 1;
 			} else {
-				newBranch.title = script.p_branch.title+'\'';
+				//ex) 1.시작:$13-#3
+				// newBranch.title = script.p_branch.title+'\'';
 				newBranch.chapter = script.p_branch.chapter;
 				script.type = 'branch'
 			}
