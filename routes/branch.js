@@ -6,6 +6,12 @@ var async = require('async');
 var logger = require('../lib/logger').trace;
 
 
+/*
+ * 주어진 브랜치의 챕터 스크립트를 보여줌
+ * 만약 해당 브랜치가 오리지날 챕터 브랜치가 아니라면
+ * 오리지널 브랜치가 나올때까지의 모든 브랜치 스크립트를 머지해서 보여줌
+ */
+
 exports.show = function(req, res, next) {
 	var branch_id = req.params.branch_id;
 
@@ -27,22 +33,29 @@ exports.show = function(req, res, next) {
 				if (err) return callback(err);
 				callback(null, branch, scripts, title);
 			});
+		},
+		function(branch, scripts, title, callback) {
+			branch.nextChapter(function(err, chapterBranch) {
+				if(err) return callback(err);
+				callback(null, branch, scripts, title, chapterBranch);
+			});
 		}
-	], function(err, branch, scripts, title) {
-		if(err) next(err);
+	], function(err, branch, scripts, title, nextChapters) {
+		if(err) return next(err);
 
 		res.render('branch/show', {
 			branch: branch, 
-			scripts:scripts,
-			title:title
+			scripts: scripts,
+			title: title,
+			nextChapters: nextChapters
 		});
 	});
 }
 
 
 /*
- * 브랜치 끝에 스크립트를 추가함
- * 만약 마지막 스크립트가 close 상태라면 챕터를 올리고 브랜치 새로따고 추가
+ * 브랜치의 스크립트 배열 마지막에 스크립트 push
+ * 만약 마지막 스크립트가 close 상태라면 챕터번호를 올린 브랜치 새로따고 추가
  */
 
 exports.write = function(req, res, next) {
@@ -86,6 +99,7 @@ exports.write = function(req, res, next) {
 				var newBranch = new Branch();
 				newBranch.owner = user;
 				newBranch.novel = branch.novel;
+				newBranch.p_chapter = branch;
 				newBranch.p_branch = branch;
 				newBranch.p_script = lastScript;
 				newBranch.chapter = branch.chapter+1;
@@ -124,7 +138,9 @@ exports.write = function(req, res, next) {
 }
 
 
-
+/*
+ * 브랜치 완료상태로 변경
+ */
 
 exports.close = function(req, res, next) {
 	if(req.session.user == null) {

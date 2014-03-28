@@ -7,6 +7,7 @@ var schema = Schema({
   owner: {type: Schema.Types.ObjectId, ref: 'User'},
 	novel: {type: Schema.Types.ObjectId, ref: 'Novel'},
 	chapter: {type: Number, default: 1},
+  p_chapter: {type: Schema.Types.ObjectId, ref: 'Branch'}, //previous chapter branch
 	p_branch: {type: Schema.Types.ObjectId, ref: 'Branch'}, //parent branch
 	p_script: {type: Schema.Types.ObjectId, ref: 'Script'}, //parent script
   title: String,
@@ -33,6 +34,18 @@ schema.methods.isWritable = function(user) {
   if(user == null) return false;
 
   return this.type != 'private' || this.owner._id+'' == user._id+'';
+}
+
+schema.methods.nextChapter = function(cb) {
+  if(this.closed == false) {
+    return cb(null, []);
+  }
+
+  this.model('Branch').find({p_branch:this._id, chapter:this.chapter+1}).exec(function(err, rows) {
+    if(err) return cb(err);
+    logger.debug('next chapter = ' + rows); 
+    cb(null, rows);
+  });
 }
 
 

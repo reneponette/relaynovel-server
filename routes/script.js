@@ -79,11 +79,13 @@ exports.write = function(req, res, next) {
 
 			if(script.type == 'close') {
 				newBranch.title = '새로운 브랜치';
+				newBranch.p_chapter = script.p_branch;
 				newBranch.chapter = script.p_branch.chapter + 1;
 			} else {
-				//ex) 1.시작:$13-#3
-				// newBranch.title = script.p_branch.title+'\'';
+				//브랜치 중간에 분기 타는경우
+				newBranch.title = script.p_branch.title;
 				newBranch.chapter = script.p_branch.chapter;
+				newBranch.p_chapter = script.p_branch.p_chapter;
 				script.type = 'branch'
 			}
 

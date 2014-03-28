@@ -12,6 +12,7 @@ block content
 			.pull-right
 				h4.text-right=branch.type
 				h4.text-right=branch.owner.nickname
+				h4.text-right=branch.closed
 			.clearfix
 			.well.scripts
 				each s in scripts
@@ -29,8 +30,8 @@ block content
 						button(id='close_branch_btn' type='submit', class='btn btn-default') close chapter
 
 			ul.pager
-				li(class='previous'): a(href='#') &larr; 이전챕터
-				li(class='next'): a(href='#') 다음챕터 &rarr;
+				li(class='previous'): a(href='/branches/#{branch.p_chapter}') &larr; 이전챕터
+				li(class='next'): a(href='/branches/#{nextChapters.length>0?nextChapters[0]._id:""}') 다음챕터 &rarr;
 
 		.panel-footer
 			form(id='write_form' role='form', method='post', action='/branches/#{branch._id}/write')
