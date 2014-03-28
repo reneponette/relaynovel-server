@@ -36,14 +36,13 @@ schema.methods.isWritable = function(user) {
   return this.type != 'private' || this.owner._id+'' == user._id+'';
 }
 
-schema.methods.nextChapter = function(cb) {
+schema.methods.nextChapters = function(cb) {
   if(this.closed == false) {
     return cb(null, []);
   }
 
   this.model('Branch').find({p_branch:this._id, chapter:this.chapter+1}).exec(function(err, rows) {
-    if(err) return cb(err);
-    logger.debug('next chapter = ' + rows); 
+    if(err) return cb(err);    
     cb(null, rows);
   });
 }

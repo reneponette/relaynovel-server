@@ -17,7 +17,7 @@ exports.show = function(req, res, next) {
 
 	async.waterfall([
 		function(callback) {
-			Branch.findById(branch_id).populate('novel owner scripts').exec(function(err, branch) {
+			Branch.findById(branch_id).populate('novel owner scripts p_chapter').exec(function(err, branch) {
 				if (err) return callback(err);
 				callback(null, branch);
 			});			
@@ -35,19 +35,24 @@ exports.show = function(req, res, next) {
 			});
 		},
 		function(branch, scripts, title, callback) {
-			branch.nextChapter(function(err, chapterBranch) {
+			branch.nextChapters(function(err, nChapters) {
 				if(err) return callback(err);
-				callback(null, branch, scripts, title, chapterBranch);
+
+				// prev/next 링크 생성
+				var prevLink = branch.p_chapter ? '/branches/'+branch.p_chapter._id : '#';
+				var nextLink = nChapters.length>0 ? '/branches/'+nChapters[0]._id : '#';
+
+				callback(null, branch, scripts, title, {prev:prevLink, next:nextLink});
 			});
 		}
-	], function(err, branch, scripts, title, nextChapters) {
+	], function(err, branch, scripts, title, links) {
 		if(err) return next(err);
 
 		res.render('branch/show', {
 			branch: branch, 
 			scripts: scripts,
 			title: title,
-			nextChapters: nextChapters
+			links: links
 		});
 	});
 }
