@@ -39,8 +39,18 @@ exports.show = function(req, res, next) {
 				if(err) return callback(err);
 
 				// prev/next 링크 생성
-				var prevLink = branch.p_chapter ? '/branches/'+branch.p_chapter._id : '#';
-				var nextLink = nChapters.length>0 ? '/branches/'+nChapters[0]._id : '#';
+				var prevLink;
+				if(branch.p_chapter) {
+					prevLink = {path:'/branches/'+branch.p_chapter._id, class:''};
+				} else {
+					prevLink = {path:'#', class:'hidden'};
+				}
+				var nextLink;
+				if(nChapters.length>0){
+					nextLink = {path:'/branches/'+nChapters[0]._id, class:''};
+				} else {
+					nextLink = {path:'#', class:'hidden'};
+				}
 
 				callback(null, branch, scripts, title, {prev:prevLink, next:nextLink});
 			});

@@ -17,56 +17,47 @@ block content
 			.well.scripts
 				each s in scripts
 					a(class='script', href='/scripts/#{s._id}') &nbsp#{s.text}
-					if(s.type == 'branch' || s.type == 'close')
+					if(s.type == 'branch')
 						span {
 							each b in s.branches
 								a(class='branch #{branch.isSame(b) ? "branch-current" : ""}',
 									href='/branches/#{branch.isSame(b) ? s.p_branch : b}')&nbsp#{branch.isSame(b)?'<-':'#'}
 						span &nbsp}
 
-			if(branch.isMine(session.user))
-				if(!branch.closed)
-					form(id='close_branch_form' role='form', method='post', action='/branches/#{branch._id}/close')
-						button(id='close_branch_btn' type='submit', class='btn btn-default') close chapter
+			if branch.closed
+				a: button(type='button', class='btn btn-default') 다음챕터 쓰기
+			else
+				if branch.isMine(session.user)
+					form(id='close' role='form', method='post', action='/branches/#{branch._id}/close')
+						button(type='submit', class='btn btn-default') 챕터 닫기
 
 			//- 챕터 페이저
 			ul.pager
-				li(class='previous'): a(href='#{links.prev}') &larr; 이전챕터
-				li(class='next'): a(href='#{links.next}') 다음챕터 &rarr;
+				li(class='previous #{links.prev.class}'): a(href='#{links.prev.path}') &larr; 이전챕터
+				li(class='next #{links.next.class}'): a(href='#{links.next.path}') 다음챕터 &rarr;
 
-		.panel-footer
-			form(id='write_form' role='form', method='post', action='/branches/#{branch._id}/write')
-				.form-group
-					textarea(id='textarea' class='form-control', rows='5', name='text', 
-									placeholder='#{branch.closed ? "완결된 챕터라 여기다 쓰면 자동으로 다음 챕터를 생성하고 이어씀." : ""}')
-				button(id='write_btn' type='submit', class='btn btn-default') 작성
-
-		input(id='close' type='hidden', name='close', value='#{branch.closed ? 1 : 0}')
+		if !branch.closed
+			.panel-footer
+				form(id='write' role='form', method='post', action='/branches/#{branch._id}/write')
+					.form-group
+						textarea(id='textarea' class='form-control', rows='5', name='text')
+					button(type='submit', class='btn btn-default') 작성
 
 	script.
 		$(document).ready(function() {
-			$('#close_branch_btn').click(function(e) {
-				e.preventDefault();
+			$('#close').submit(function(e) {
 				var ret = confirm('브랜치는 한번 닫으면 다시 열 수 없는데... 그래도 할꺼임?');
-				if(ret)
-					$('#close_branch_form').submit();
+				if(!ret)
+					e.preventDefault();
 			});
 
-			$('#write_btn').click(function(e) {
+			$('#write').submit(function(e) {
 				//스크립트 길이 체크
 				var script = $('#textarea').val();
-				if(script.length == 0) {
+				if(script.length < 10) {
 					alert('너무 짧아!');
 					e.preventDefault();
 					return;				
-				}
-
-				var close = $('#close').val();
-				if(close == 1) {
-					e.preventDefault();
-					var ret = confirm('다음 챕터에 이어 쓸거임?');
-					if(ret)
-						$('#write_form').submit();
 				}
 			});
 
