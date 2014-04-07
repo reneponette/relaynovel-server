@@ -6,6 +6,11 @@ var async = require('async');
 var logger = require('../lib/logger').trace;
 
 
+exports.new = function(req, res, next) {
+		res.render('branch/_form', {branch_id:req.params.branch_id});
+}
+
+
 /*
  * 주어진 브랜치의 챕터 스크립트를 보여줌
  * 만약 해당 브랜치가 오리지날 챕터 브랜치가 아니라면
@@ -69,8 +74,79 @@ exports.show = function(req, res, next) {
 
 
 /*
+ * 다음 챕터 브랜치 생성
+ */
+
+exports.create = function(req, res, next) {
+	if(req.session.user == null) {
+		return next('로그인해라');
+	}
+
+	var branch_id = req.params.branch_id;
+	var title = req.body.title;
+	var script = req.body.script;
+
+	async.waterfall([
+		function(callback) {
+			User.findById(req.session.user._id, function(err, user) {
+				if(err) return callback(err);
+				callback(null, user);
+			});	
+		},
+
+		function(user, callback) {
+			Branch.findById(branch_id).populate('owner scripts').exec(function(err, branch) {
+				if(err) return callback(err);
+				callback(null, user, branch);
+			})
+		},
+		function(user, branch, callback) {
+
+			if(!branch.isWritable(user)) {
+				return callback('넌 권한이 없어');
+			}
+
+			var newScript = new Script({text:script});
+			var scripts = branch.scripts;
+			var lastScript = scripts[scripts.length-1];
+			var newBranch = new Branch();
+
+			newBranch.owner = user;
+			newBranch.novel = branch.novel;
+			newBranch.title = title;
+			newBranch.p_chapter = branch;
+			newBranch.p_branch = branch;
+			newBranch.p_script = lastScript;
+			newBranch.chapter = branch.chapter+1;
+
+			lastScript.branches.push(newBranch);
+			lastScript.save(function(err) {
+				if(err) return next(err);
+			});				
+
+			newBranch.scripts.push(newScript);
+			newBranch.save(function(err) {
+				if(err) return callback(err);
+			});
+
+			newScript.owner = user;
+			newScript.p_branch = newBranch;
+			newScript.save(function(err) {
+				if(err) return callback(err);
+			});
+
+			callback(null, newBranch);			
+		}
+	],
+	function(err, newBranch) {
+		if(err) return next(err);
+		res.redirect('/branches/'+newBranch._id);
+	});
+
+}
+
+/*
  * 브랜치의 스크립트 배열 마지막에 스크립트 push
- * 만약 마지막 스크립트가 close 상태라면 챕터번호를 올린 브랜치 새로따고 추가
  */
 
 exports.write = function(req, res, next) {
@@ -80,7 +156,7 @@ exports.write = function(req, res, next) {
 	}
 
 	var branch_id = req.params.branch_id;
-	var text = req.body.text;		
+	var script = req.body.script;
 
 	async.waterfall([
 		function(callback) {
@@ -103,41 +179,13 @@ exports.write = function(req, res, next) {
 				return callback('넌 권한이 없어');
 			}
 
-			var newScript = new Script({text:text});
+			var newScript = new Script({text:script});
 			newScript.owner = user;
-
-			if(branch.closed) {
-
-				var scripts = branch.scripts;
-				var lastScript = scripts[scripts.length-1];
-
-				var newBranch = new Branch();
-				newBranch.owner = user;
-				newBranch.novel = branch.novel;
-				newBranch.p_chapter = branch;
-				newBranch.p_branch = branch;
-				newBranch.p_script = lastScript;
-				newBranch.chapter = branch.chapter+1;
-
-				lastScript.branches.push(newBranch);
-				lastScript.save(function(err) {
-					if(err) return next(err);
-				});				
-
-				newScript.p_branch = newBranch;
-				newBranch.scripts.push(newScript);
-				newBranch.save(function(err) {
-					if(err) return callback(err);
-				});
-
-			} else {
-
-				newScript.p_branch = branch;
-				branch.scripts.push(newScript);
-				branch.save(function(err) {
-					if(err) return callback(err);
-				});
-			}
+			newScript.p_branch = branch;
+			branch.scripts.push(newScript);
+			branch.save(function(err) {
+				if(err) return callback(err);
+			});
 
 			newScript.save(function(err) {
 				if(err) return callback(err);

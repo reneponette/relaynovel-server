@@ -69,13 +69,15 @@ app.get('/users/logout', user.logout);
 
 //novels
 app.get('/novels', novel.list);
-app.get('/novels/new', novel.new);
+app.get('/novels/new', novel.new); //소설 + 최상위 브랜치 생성
+app.get('/novels/:novel_id/new', novel.new); //최상위 브랜치 생성
 app.post('/novels/create', novel.create);
-// app.get('/novels/:novel_id', novel.show);
 
 //branches
 app.get('/branches/:branch_id', branch.show);
-app.post('/branches/:branch_id/write', branch.write);
+app.get('/branches/:branch_id/new', branch.new);
+app.post('/branches/:branch_id/create', branch.create); //다음 챕터 + 스크립트 쓰기
+app.post('/branches/:branch_id/write', branch.write); //스크립트 쓰기
 app.post('/branches/:branch_id/close', branch.close);
 
 //scripts

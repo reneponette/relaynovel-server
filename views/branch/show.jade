@@ -25,7 +25,7 @@ block content
 						span &nbsp}
 
 			if branch.closed
-				a: button(type='button', class='btn btn-default') 다음챕터 쓰기
+				a(href='/branches/#{branch._id}/new'): button(type='button', class='btn btn-default') 다음챕터 쓰기
 			else
 				if branch.isMine(session.user)
 					form(id='close' role='form', method='post', action='/branches/#{branch._id}/close')
@@ -40,7 +40,7 @@ block content
 			.panel-footer
 				form(id='write' role='form', method='post', action='/branches/#{branch._id}/write')
 					.form-group
-						textarea(id='textarea' class='form-control', rows='5', name='text')
+						textarea(id='textarea' class='form-control', rows='5', name='script')
 					button(type='submit', class='btn btn-default') 작성
 
 	script.
@@ -64,7 +64,7 @@ block content
 			$('#textarea').keypress(function(e) {
 				var code = (e.keyCode ? e.keyCode : e.which);
 				if(code == 13 && e.shiftKey) {
-					$('#write_btn').click();
+					$('#write').submit();
 				}				
 			});
 		});
