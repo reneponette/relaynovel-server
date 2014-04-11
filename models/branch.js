@@ -61,7 +61,7 @@ schema.methods.chapterTitle = function(cb) {
       var bNext = branches[i+1];
 
       if(i==0) {
-        title = b.chapter + '. ' + b.title;
+        title = b.title ? b.title : '무제';
       } 
 
       if(bNext === undefined) break;

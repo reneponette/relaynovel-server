@@ -1,33 +1,77 @@
 @import "../../bower_components/bootstrap/less/bootstrap.less";
 
-@body-bg: #fce811;
+@body-bg: #888888;
+@link-color: black;
+@link-hover-color: lighten(@link-color, 50%);
+
+
+// 스크립트 스타일//////////////
+a.script {
+	font-family: serif;
+	&:hover {
+		text-decoration: none;
+	}
+}
+
+a.brch-link {
+	color: blue;
+	&:hover {
+		color: red;
+	}
+}
+a.brch-link-cur {
+	color: green;
+	&:hover {
+		color: red;
+	}	
+}
+/////////////////////////////
 
 
 .panel {
 	margin-bottom: 20px;
 	background-color: #fff;
-	border: 1px solid transparent;
+	border: 0px solid transparent;
 	border-radius: 0px;
-	-webkit-box-shadow: 0 5px 5px rgba(0,0,0,0.05);
-	box-shadow: 0 5px 5px rgba(0,0,0,0.05);
+	-webkit-box-shadow: 0px 5px 5px rgba(0,0,0,0.05);
+	box-shadow: 0px 5px 5px rgba(0,0,0,0.05);
+	.panel-heading {
+		background-color: #fce811;
+	}
+}
+
+.title {
+	font-family: serif;
+}
+
+.branch {
+	padding-top: 0px;
+	padding-bottom: 0px;
 }
 
 
-.scripts {
-	a.script {
-		color: black;
-		text-decoration: none;
+.branch-heading {
+	margin-top: -1px;
+	margin-bottom: 40px;
+	background-color: #fff;
+	border: 1px solid rgba(0,0,0,0.1);
+	border-radius: 0px;
+	-webkit-box-shadow: 0px 5px 5px rgba(0,0,0,0.15);
+	box-shadow: 0px 5px 5px rgba(0,0,0,0.15);
+
+	.chapter {
+		font-family: cursive;
 	}
-	a.script:hover {
-		color: #666;
-	}
-	a.branch {
-		color: blue;		
-	}
-	a.branch-current {
-		color: green;
-	}
-	a.branch:hover {
-		color: red;		
-	}	
+
+}
+
+.branch-footer {
+	margin-top: 40px;
+	margin-bottom: -1px;
+	background-color: #fff;
+	border: 1px solid rgba(0,0,0,0.1);
+	border-radius: 0px;
+	-webkit-box-shadow: 0px -5px 5px rgba(0,0,0,0.15);
+	box-shadow: 0px -5px 5px rgba(0,0,0,0.15);	
+
 }

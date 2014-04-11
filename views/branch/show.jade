@@ -3,53 +3,66 @@ extends ../layout
 block content
 	.panel.panel-default
 		.panel-heading
-			h2.pull-left=branch.novel.title
+			h2.title.pull-left=branch.novel.title
 			.pull-right
-				h4=branch.novel.type
+				h4: span.label.label-default=branch.novel.type
 			.clearfix
-		.panel-body
-			h4.pull-left #{title} #{branch.closed ? '(완)' : ''}
-			.pull-right
-				h4.text-right=branch.type
-				h4.text-right=branch.owner.nickname
-				h4.text-right=branch.closed
-			.clearfix
-			.well.scripts
+
+		.branch.panel-body
+
+			.branch-heading.well
+				h4.pull-left.chapter Chapter #{branch.chapter} - #{title}
+				.pull-right(style='text-align: right;')
+					div: .label.label-default <span class='glyphicon glyphicon-tower'></span> #{branch.owner.nickname}
+					div: .label.label-default #{branch.type}
+					//- div: .label.label-default #{branch.closed}				
+				.clearfix
+
+			.branch-body
 				each s in scripts
-					a(class='script', href='/scripts/#{s._id}') &nbsp#{s.text}
+					a.script(href='/scripts/#{s._id}')  #{s.text}
 					if(s.type == 'branch')
 						span {
 							each b in s.branches
-								a(class='branch #{branch.isSame(b) ? "branch-current" : ""}',
-									href='/branches/#{branch.isSame(b) ? s.p_branch : b}')&nbsp#{branch.isSame(b)?'<-':'#'}
-						span &nbsp}
+								a.brch-link(class='#{branch.isSame(b) ? "brch-link-cur" : ""}', href='/branches/#{branch.isSame(b) ? s.p_branch : b}')  #{branch.isSame(b)?'<':'#'}
+						span  }
 
-			if branch.closed
-				a(href='/branches/#{branch._id}/new'): button(type='button', class='btn btn-default') 다음챕터 쓰기
-			else
-				if branch.isMine(session.user)
-					form(id='close' role='form', method='post', action='/branches/#{branch._id}/close')
-						button(type='submit', class='btn btn-default') 챕터 닫기
+			.branch-footer.well
+				if branch.closed
+					a(href='/branches/#{branch._id}/new'): button(type='button', class='btn btn-default') 다음챕터 쓰기
+				else if branch.isMine(session.user)
+					form(id='write' role='form', method='post', action='/branches/#{branch._id}/write')
+						.form-group
+							textarea(id='textarea', class='form-control', rows='5', name='script')
+						button(id='writeBtn', type='button', class='btn btn-default') 작성
+						&nbsp;
+						button(id='closeBtn', type='button', class='btn btn-default') 챕터 닫기
 
+		.panel-footer
 			//- 챕터 페이저
 			ul.pager
 				li(class='previous #{links.prev.class}'): a(href='#{links.prev.path}') &larr; 이전챕터
-				li(class='next #{links.next.class}'): a(href='#{links.next.path}') 다음챕터 &rarr;
+				li(class='next #{links.next.class}'): a(href='#{links.next.path}') 다음챕터 &rarr;						
 
-		if !branch.closed
-			.panel-footer
-				form(id='write' role='form', method='post', action='/branches/#{branch._id}/write')
-					.form-group
-						textarea(id='textarea' class='form-control', rows='5', name='script')
-					button(type='submit', class='btn btn-default') 작성
+		form(id='close' role='form', method='post', action='/branches/#{branch._id}/close')
+
 
 	script.
 		$(document).ready(function() {
+
+			$('#closeBtn').click(function() {
+				$('#close').submit();
+			});
+
 			$('#close').submit(function(e) {
 				var ret = confirm('브랜치는 한번 닫으면 다시 열 수 없는데... 그래도 할꺼임?');
 				if(!ret)
 					e.preventDefault();
 			});
+
+			$('#writeBtn').click(function() {
+				$('#write').submit();
+			});			
 
 			$('#write').submit(function(e) {
 				//스크립트 길이 체크
