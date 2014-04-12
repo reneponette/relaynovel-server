@@ -10,8 +10,8 @@ block content
 
 		.branch.panel-body
 
-			.branch-heading.well
-				h4.pull-left.chapter Chapter #{branch.chapter} - #{title}
+			.branch-heading
+				h4.chapter.pull-left Chapter #{branch.chapter} - #{title}
 				.pull-right(style='text-align: right;')
 					div: .label.label-default <span class='glyphicon glyphicon-tower'></span> #{branch.owner.nickname}
 					div: .label.label-default #{branch.type}
@@ -27,7 +27,7 @@ block content
 								a.brch-link(class='#{branch.isSame(b) ? "brch-link-cur" : ""}', href='/branches/#{branch.isSame(b) ? s.p_branch : b}')  #{branch.isSame(b)?'<':'#'}
 						span  }
 
-			.branch-footer.well
+			.branch-footer
 				if branch.closed
 					a(href='/branches/#{branch._id}/new'): button(type='button', class='btn btn-default') 다음챕터 쓰기
 				else if branch.isMine(session.user)

@@ -64,7 +64,9 @@ app.get('/', routes.index);
 
 //users
 app.get('/users', user.list);
+app.get('/users/new', user.new);
 app.post('/users/create', user.create);
+app.get('/users/login', user.login_form);
 app.post('/users/login', user.login);
 app.get('/users/logout', user.logout);
 

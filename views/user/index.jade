@@ -9,12 +9,14 @@ block content
 			table.table.table-striped
 				thead
 					tr
-						th nickname
 						th email
-
+						th password
+						th nickname
 				tbody
 					each user in users
 						tr
-							td=user.nickname
 							td=user.email
+							td=user.password
+							td=user.nickname
+							
 

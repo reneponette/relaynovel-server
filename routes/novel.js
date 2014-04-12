@@ -15,7 +15,7 @@ exports.list = function(req, res, next) {
 		if(err) return next(err);
 
 		res.render('novel/index', {
-			title: 'Novel List',
+			title: '소설 목록',
 			novels: novels
 		});
 	});	
@@ -31,7 +31,7 @@ exports.new = function(req, res, next) {
 	logger.info('user = ' + JSON.stringify(req.session.user));
 
 	res.render('novel/_form', {
-		title: 'New Novel'
+		title: '새 소설을 만들자!'
 	});			
 }
 
@@ -51,11 +51,16 @@ exports.create = function(req, res, next) {
 
 		function(user, callback) {
 			var title = req.body.title;
-			var chapter_title = req.body.chapter;
+			var type = req.body.type;
+			var synopsis = req.body.synopsis;
+
+			var chapter_title = req.body.chapter_title;
+			var chapter_type = req.body.chapter_type;
+
 			var script = req.body.script;
 
-			var novel = new Novel({title:title});
-			var branch = new Branch({title:chapter_title});
+			var novel = new Novel({title:title, type:type, synop:synopsis});
+			var branch = new Branch({title:chapter_title, type:chapter_type});
 			var script = new Script({text:script});
 
 			novel.owner = user;

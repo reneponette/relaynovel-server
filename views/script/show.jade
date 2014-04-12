@@ -5,9 +5,9 @@ block content
 		.panel-heading
 			span 타입: #{script.type}
 		.panel-body
-			.well.scripts
+			.well
 				each s in scripts
-					&nbsp#{s.text}
+					span.script  #{s.text}
 		.panel-footer
 			form(id='write', role='form', method='post', action='/scripts/#{script._id}/write')
 				.form-group
