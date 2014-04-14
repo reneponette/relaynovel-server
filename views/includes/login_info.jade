@@ -2,16 +2,10 @@ if !session.user
 	.navbar-form.navbar-right
 		a(href="/users/new") 가입하기
 		&nbsp;
-		a(href="/users/login"): button(type='button', class='btn btn-default') 로그인
-
-	//- form(action='/users/login' method='post' class='navbar-form navbar-right', role='login')
-		input(type='text', name='nickname' class='form-control', placeholder='nickname')
-		input(type='password', name='password' class='form-control', placeholder='password')
-		button(type='submit', class='btn btn-default') SignIn	
-
+		button.btn.btn-default(type='button', data-toggle='modal', data-target='#loginModal') 로그인
 else
-	form(action='/users/logout', method='get' class='navbar-form navbar-right', role='login')
+	form.navbar-form.navbar-right(action='/users/logout', method='get', role='login')
 		.form-group			
-			span #{session.user.nickname}&nbsp			
-				button(type='submit', class='btn btn-default') SignOut
-
+			span #{session.user.nickname}
+			&nbsp			
+			button(type='submit', class='btn btn-default') 로그아웃

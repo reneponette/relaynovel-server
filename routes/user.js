@@ -62,18 +62,12 @@ exports.create = function(req, res, next) {
 			console.log(err);
 			return next(err);
 		}
-		res.redirect('/users');		
+		res.redirect('/novels');
 	});
 };
 
 
 //-----------------------------------------
-
-exports.login_form = function(req, res, next) {
-	res.render('user/_login', {
-		title: '로그인'
-	});
-}
 
 exports.login = function(req, res, next) {
 	var	email = req.body.email;
