@@ -1,15 +1,61 @@
+div(id='fb-root', style='display:none;')
 .modal.fade(id='loginModal', role='dialog', aria-labelledby='loginModalLabel', aria-hidden='true')
 	.modal-dialog.modal-sm
 		.modal-content
 			.modal-header
 				button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
-				h4.modal-title(id='loginModalLabel') 로그인					
+				h4.modal-title(id='loginModalLabel') 로그인
 			.modal-body
-				form(action='/users/login', method='post', role='login')
-					.form-group			
+
+				button(id='loginWithFBBtn', type='button', class='btn btn-default') facebook
+
+				form(action='/users/login', method='post', role='login', style='display:none')
+					.form-group
 						input(type='text', name='email', class='form-control', placeholder='email')
 					.form-group			
 						input(type='password', name='password', class='form-control', placeholder='password')
 					button.pull-right(type='submit', class='btn btn-default') 제출
 					.clearfix
 
+script.
+	$(document).ready(function() {
+		$.ajaxSetup({ cache: true });
+		$.getScript('//connect.facebook.net/en_UK/all.js', function(){
+			FB.init({
+				appId      : '153865098017848',
+				status     : true,
+				xfbml      : true
+			});
+
+			FB.Event.subscribe('auth.authResponseChange', function(response) {
+				if (response.status === 'connected') {
+
+					if(#{session.user ? true : false}) return;
+
+					//세션 생성
+					var fbToken = response.authResponse.accessToken;
+					FB.api('/me', function(response) {
+						$.post('/users/login', {
+								fbToken:fbToken,
+								fbUser:response
+							}, function(result) {
+							location.reload();
+						});
+					});
+				}
+			});
+		});
+
+		$('#loginWithFBBtn').click(function() {
+			$('#loginModal').modal('hide');
+			FB.login(function(response) {}, {scope: 'email'});
+		});	
+
+		$('#logoutBtn').click(function() {
+			FB.logout(function(response) {
+				$.get('/users/logout', function(result) {
+					location.reload();
+				});
+			});
+		})
+	});

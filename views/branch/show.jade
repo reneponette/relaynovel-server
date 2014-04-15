@@ -11,11 +11,12 @@ block content
 		.branch.panel-body
 
 			.branch-heading
-				h4.chapter.pull-left Chapter #{branch.chapter} - #{title}
+				.pull-left
+					h4.chapter Chapter #{branch.chapter} - #{title}
+					h5.synopsis Synopsis - #{branch.novel.synop}					
 				.pull-right(style='text-align: right;')
 					div: .label.label-default <span class='glyphicon glyphicon-tower'></span> #{branch.owner.nickname}
 					div: .label.label-default #{branch.type}
-					//- div: .label.label-default #{branch.closed}				
 				.clearfix
 
 			.branch-body

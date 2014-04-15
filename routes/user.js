@@ -70,32 +70,32 @@ exports.create = function(req, res, next) {
 //-----------------------------------------
 
 exports.login = function(req, res, next) {
-	var	email = req.body.email;
-	var password = req.body.password;
+	var	fbToken = req.body.fbToken;	
+	var fbUser = req.body.fbUser;
 
 	async.waterfall([
-		//기존 유저 있는지 검사
 		function(callback) {
-			User.findOne({email:email}, function(err, user) {
+			User.findOne({fbId:fbUser.id}, function(err, user) {
 				if(err) return callback(err);
 				callback(null, user);
 			});
 		},
 		function(user, callback) {
-			if(user) {
-	      user.comparePassword(password, function(err, isMatch) {
-	        if (err) return callback(err);
-
-					if(isMatch) {
-						req.session.user = user;
-						callback(null);
-					} else {
-						callback('비번틀림');
-					}
-	      });
-			} else {
-				callback('그런유저없음');
+			if(!user) {
+				user = new User({
+					fbToken:fbToken,
+					fbId:fbUser.id
+				});
 			}
+			user.nickname = fbUser.name;
+			user.profileImg = 'http://graph.facebook.com/' + fbUser.id + '/picture';
+
+			req.session.user = user;
+
+			user.save(function(err) {
+				if(err) return next(err);
+				callback(null);
+			});
 		}
 	],
 	function(err, results) {
@@ -103,10 +103,10 @@ exports.login = function(req, res, next) {
 			console.log(err);
 			return next(err);
 		}
-
-		res.redirect('back');
+		res.json({code:0});
 	});
 };
+
 
 exports.logout = function(req, res, next) {
 	req.session.user = null;
