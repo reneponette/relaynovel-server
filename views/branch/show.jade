@@ -5,8 +5,8 @@ block content
 		.panel-heading.novel
 			.novel-description
 				h2.title=branch.novel.title
-				h4.synopsis Synopsis <small>(<a id='expandSynopNovel'>펼치기</a>)</small>
-				p(id='synopNovel') #{branch.novel.synopsis}
+				h4.backgrounds Backgrounds <small>(<a id='expandBackgrounds'>펼치기</a>)</small>
+				p(id='backgrounds') #{branch.novel.backgrounds}
 			.novel-properties
 				h4: span.label.label-default=branch.novel.type
 
@@ -85,7 +85,7 @@ block content
 				}				
 			});
 
-			$('#expandSynopNovel').click(function() {
-				$('#synopNovel').toggle('slow');
+			$('#expandBackgrounds').click(function() {
+				$('#backgrounds').toggle('slow');
 			});
 		});

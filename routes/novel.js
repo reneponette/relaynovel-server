@@ -52,7 +52,7 @@ exports.create = function(req, res, next) {
 		function(user, callback) {
 			var title = req.body.title;
 			var type = req.body.type;
-			var synopsis = req.body.synopsis;
+			var backgrounds = req.body.backgrounds;
 
 			var chapter_title = req.body.chapter_title;
 			var chapter_type = req.body.chapter_type;
@@ -60,7 +60,7 @@ exports.create = function(req, res, next) {
 
 			var script = req.body.script;
 
-			var novel = new Novel({title:title, type:type, synopsis:synopsis});
+			var novel = new Novel({title:title, type:type, backgrounds:backgrounds});
 			var branch = new Branch({title:chapter_title, type:chapter_type, synopsis:chapter_synopsis});
 			var script = new Script({text:script});
 

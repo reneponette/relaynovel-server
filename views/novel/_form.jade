@@ -17,8 +17,8 @@ block content
 							option(value='public', selected=true) 공동소설 (각 챕터를 다른이가 쓸 수 있다.)
 							option(value='private') 개인소설 (각 챕터를 너밖에 못 쓴다.)
 					.form-group
-						label 시놉시스
-						textarea(id='textarea', class='form-control', rows='5', name='synopsis', placeholder='대략적인 이야기 배경이라던가... 주인공 설정등을 여기다 쓴다.. 다름사람이 엉뚱한 이야기 쓰지 않도록..')
+						label 배경
+						textarea(id='textarea', class='form-control', rows='5', name='backgrounds', placeholder='대략적인 이야기 배경이라던가... 주인공 설정등을 여기다 씀.')
 				
 				.shadow-box
 					h3.shadow-box-heading(style='font-family:cursive;') Chapter 1
@@ -32,7 +32,7 @@ block content
 							option(value='public') 공동챕터 (다른놈이 챕터 중간에서 이야기 가지치기를 할 수 있다.)
 					.form-group
 						label 시놉시스
-						textarea(id='textarea', class='form-control', rows='5', name='chapter_synopsis', placeholder='대략적인 이야기 배경이라던가... 주인공 설정등을 여기다 쓴다.. 다름사람이 엉뚱한 이야기 쓰지 않도록..')
+						textarea(id='textarea', class='form-control', rows='5', name='chapter_synopsis', placeholder='챕터 줄거리를 씀. 다름 사람이 엉뚱한 이야기 쓰지 않도록..')
 					.form-group
 						label 내용
 						textarea(id='textarea', class='form-control', rows='5', name='script', placeholder='이제 본격적인 첫 챕터 이야기를 여기다 써. 근데 한줄 쓸땐 적어도 10자 이상은 써야함.')
