@@ -2,22 +2,25 @@ extends ../layout
 
 block content
 	.panel.panel-default
-		.panel-heading
-			h2.title.pull-left=branch.novel.title
-			.pull-right
+		.panel-heading.novel
+			.novel-description
+				h2.title=branch.novel.title
+				h4.synopsis Synopsis <small>(<a id='expandSynopNovel'>펼치기</a>)</small>
+				p(id='synopNovel') #{branch.novel.synopsis}
+			.novel-properties
 				h4: span.label.label-default=branch.novel.type
-			.clearfix
 
 		.branch.panel-body
 
 			.branch-heading
-				.pull-left
+				.branch-description
 					h4.chapter Chapter #{branch.chapter} - #{title}
-					h5.synopsis Synopsis - #{branch.novel.synop}					
-				.pull-right(style='text-align: right;')
-					div: .label.label-default <span class='glyphicon glyphicon-tower'></span> #{branch.owner.nickname}
+					h4.synopsis Synopsis
+					p #{branch.synopsis}					
+				.branch-properties
+					div: img(src='#{branch.owner.profileImg}', style='width:30px;')
+					div(style='display:none;'): .label.label-default <span class='glyphicon glyphicon-tower'></span> #{branch.owner.nickname}
 					div: .label.label-default #{branch.type}
-				.clearfix
 
 			.branch-body
 				each s in scripts
@@ -80,5 +83,9 @@ block content
 				if(code == 13 && e.shiftKey) {
 					$('#write').submit();
 				}				
+			});
+
+			$('#expandSynopNovel').click(function() {
+				$('#synopNovel').toggle('slow');
 			});
 		});

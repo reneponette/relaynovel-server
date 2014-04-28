@@ -5,7 +5,7 @@ var schema = Schema({
 	owner: { type: Schema.Types.ObjectId, ref: 'User' },
 	t_branch: { type: Schema.Types.ObjectId,	ref: 'Branch' },
   title: { type: String, required: true },
-  synop: String,
+  synopsis: String,
   closed: { type: Boolean, default: false },
   type: { type: String, default: 'private' },
   vote: { type: Number, default: 0 },

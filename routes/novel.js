@@ -56,11 +56,12 @@ exports.create = function(req, res, next) {
 
 			var chapter_title = req.body.chapter_title;
 			var chapter_type = req.body.chapter_type;
+			var chapter_synopsis = req.body.chapter_synopsis;
 
 			var script = req.body.script;
 
-			var novel = new Novel({title:title, type:type, synop:synopsis});
-			var branch = new Branch({title:chapter_title, type:chapter_type});
+			var novel = new Novel({title:title, type:type, synopsis:synopsis});
+			var branch = new Branch({title:chapter_title, type:chapter_type, synopsis:chapter_synopsis});
 			var script = new Script({text:script});
 
 			novel.owner = user;

@@ -7,11 +7,14 @@ block content
 		.panel-body
 			form(id='create', action='/branches/#{branch_id}/create', method='post', class='col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-3')
 				.form-group
-					label title
+					label 챕터 제목
 					input(class='form-control', type='text', name='title')
 				.form-group
-					label script
-					input(id='script', class='form-control', type='text', name='script')							
+					label 시놉시스
+					textarea(id='textarea', class='form-control', rows='5', name='synopsis', placeholder='대략적인 챕터의 윤곽을 여기다 씀.')
+				.form-group
+					label 내용
+					textarea(id='textarea', class='form-control', rows='5', name='script', placeholder='적어도 10자 이상은 써야함.')
 				.form-actions
 					input(class='btn btn-default', name='commit', type='submit', value='create')
 					a(class='btn', href='/novels') Cancel

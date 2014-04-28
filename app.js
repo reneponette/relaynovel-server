@@ -60,7 +60,7 @@ db.once('open', function callback () {
 });
 
 
-app.get('/', routes.index);
+app.get('/', novel.list);
 
 //users
 app.get('/users', user.list);

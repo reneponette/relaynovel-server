@@ -85,6 +85,7 @@ exports.create = function(req, res, next) {
 	var branch_id = req.params.branch_id;
 	var title = req.body.title;
 	var script = req.body.script;
+	var synopsis = req.body.synopsis;
 
 	async.waterfall([
 		function(callback) {
@@ -114,6 +115,7 @@ exports.create = function(req, res, next) {
 			newBranch.owner = user;
 			newBranch.novel = branch.novel;
 			newBranch.title = title;
+			newBranch.synopsis = synopsis;
 			newBranch.p_chapter = branch;
 			newBranch.p_branch = branch;
 			newBranch.p_script = lastScript;

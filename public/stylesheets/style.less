@@ -64,11 +64,28 @@ a.brch-link-cur {
 	}
 }
 
+.novel {
+	position: relative;
+	
+	.novel-description {
+		.synopsis {
+			font-family: cursive;
+		}
+	}
+	.novel-properties {
+		text-align: right;
+		position: absolute;
+		top:10px;
+		right:10px;	
+	}
+}
+
 .branch {
 	padding-top: 0px;
 	padding-bottom: 0px;
 
 	.branch-heading {
+		position: relative;
 		min-height: 20px;
 		padding: 19px;
 		margin-top: -1px;
@@ -79,13 +96,24 @@ a.brch-link-cur {
 		-webkit-box-shadow: 0px 5px 5px rgba(0,0,0,0.15);
 		box-shadow: 0px 5px 5px rgba(0,0,0,0.15);
 
-		.chapter {
-			font-family: cursive;
-		}
-		.synopsis {
-			font-family: cursive;
+		.branch-description {
+			margin-right: 150px;
+			.chapter {
+				font-family: cursive;
+				font-weight: bold;
+				margin-bottom: 20px;
+			}
+			.synopsis {
+				font-family: cursive;
+			}
 		}
 
+		.branch-properties {
+			text-align: right;
+			position: absolute;
+			top:10px;
+			right:10px;
+		}
 	}
 
 	.branch-footer {

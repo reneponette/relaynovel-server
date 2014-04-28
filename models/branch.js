@@ -11,6 +11,7 @@ var schema = Schema({
 	p_branch: { type: Schema.Types.ObjectId, ref: 'Branch' }, //parent branch
 	p_script: { type: Schema.Types.ObjectId, ref: 'Script' }, //parent script
   title: { type: String, required: true },
+  synopsis: String,  
   scripts: [{ type: Schema.Types.ObjectId, ref: 'Script' }],
   type: { type: String, default:'private' },
   closed: { type: Boolean, default: false },
